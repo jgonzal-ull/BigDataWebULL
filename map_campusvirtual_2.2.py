@@ -19,7 +19,7 @@ def check_params():
 def map(year):
     lines = 0
     error = 0
-    meses = {"Dec": "12", "Nov": "11", "Oct": "10", "Sep": "09", "Aug": "08"}
+    meses = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12" }
     dias = {" 1": "01", " 2": "02", " 3": "03", " 4": "04", " 5": "05", " 6": "06", " 7": "07", " 8": "08",
             " 9": "09", "10": "10", "11": "11", "12": "12", "13": "13", "14": "14",
             "15": "15", "16": "16", "17": "17", "18": "18", "19": "19", "20": "20", "21": "21", "22": "22", "23": "23",
@@ -45,16 +45,20 @@ def map(year):
             "10.117": "Cableada", "10.217": "Cableada","10.118": "Cableada","10.218": "Cableada","10.119": "Cableada","10.219": "Cableada",
             "10.120": "Cableada", "10.220": "Cableada","10.121": "Cableada","10.221": "Cableada","10.122": "Cableada","10.222": "Cableada",
             "10.123": "Cableada", "10.223": "Cableada","10.124": "Cableada","10.224": "Cableada","10.125": "Cableada","10.225": "Cableada",
-            "10.126": "Cableada", "10.226": "Cableada","10.127": "Cableada","10.227": "Cableada",
-            "10.107": "Cableada"}
+            "10.126": "Cableada", "10.226": "Cableada","10.127": "Cableada","10.227": "Cableada","10.4": "Cableada",
+            "10.107": "Cableada", "193.145.96": "PublicoInterno", "193.145.97": "PublicoInterno", "193.145.98": "PublicoInterno",
+            "193.145.99": "PublicoInterno", "193.145.100": "PublicoInterno", "193.145.101": "PublicoInterno", "193.145.102": "PublicoInterno", "193.145.103": "PublicoInterno",
+            "193.145.104": "PublicoInterno", "193.145.105": "PublicoInterno", "193.145.106": "PublicoInterno", "193.145.107": "PublicoInterno", "193.145.108": "PublicoInterno",
+            "193.145.109": "PublicoInterno", "193.145.110": "PublicoInterno", "193.145.111": "PublicoInterno", "193.145.112": "PublicoInterno", "193.145.113": "PublicoInterno",
+            "193.145.114": "PublicoInterno", "193.145.115": "PublicoInterno", "193.145.116": "PublicoInterno", "193.145.117": "PublicoInterno", "193.145.118": "PublicoInterno",
+            "193.145.119": "PublicoInterno", "193.145.120": "PublicoInterno", "193.145.121": "PublicoInterno", "193.145.122": "PublicoInterno", "193.145.123": "PublicoInterno",
+            "193.145.124": "PublicoInterno", "193.145.125": "PublicoInterno", "127.0.0": "Local" , "localhost": "Local"}
 
     for line in sys.stdin:
         lines += 1
         mes = meses.get(line[0:3], "Error")
         dia = dias.get(line[4:6], "Error")
         hora = horas.get(line[7:9], "Error")
-        externo = "externo"
-        tipoconex = "externo"
         if mes == "Error":
             error += 1
             return ("Error mes" + line)
@@ -64,55 +68,22 @@ def map(year):
         if hora == "Error":
             error += 1
             return ("Error hora " + line)
-        campos = line.split(" ")
-        ip = campos[5].split(".")
-        if ip[0][0:6] == "apache":
-            ip = campos[6].split(".")
 
-        if (ip[0] == "systemon5"):
-            externo = "monitorizar"
-            tipoconex = "Cableada"
-        elif (ip[0] == "::1"):
-            externo = "redirigir"
-            tipoconex = "Cableada"
-        elif  (ip[0] == "www" and ip[1] == "campusvirtual"):
-            externo = "redirigir"
-            tipoconex = "Cableada"
-        elif  (ip[0] == "ocw" and ip[1] == "ull"):
-            externo = "redirigir"
-            tipoconex = "Cableada"
-        elif (ip[2] == "staticip"):
-            externo = "redirigir"
-            tipoconex = "Cableada"
+        campos = line.split()
+        server = campos[3]
+        aplicacion = campos[4]
+        ip = campos[5].split(".")
+
+        if len(ip) == 1:
+            cadena_ip = ip[0] + ";0;0;0"
+        elif len(ip) == 2:
+            cadena_ip = ip[0] + ";" + ip[1] + ";0;0"
+        elif len(ip) == 3:
+            cadena_ip = ip[0] + ";" + ip[1] + ";" + ip[2] + ";0"
         else:
-            if not ip[0].isdigit():
-                print(campos)
-                return ("Error ip1 no es dígito <"+ ip[0] + "> " + line)
-            ip1 = int(ip[0])
-            if not ip[1].isdigit():
-                return ("Error ip2 no es dígito" + line)
-            ip2 = int(ip[1])
-            if not ip[2].isdigit():
-                return ("Error ip3 no es dígito" + line)
-            ip3 = int(ip[2])
-            if not ip[3].isdigit():
-                return ("Error ip4 no es dígito" + line)
-            if ip1 == 10:
-                externo = "interno"
-                clave = ip[0] + '.' + ip[1]
-                tipoconex = tipo.get(clave, "Error")
-                if tipoconex == 'Error':
-                    return ("Error ip conexión" + ip[0] + '.' + ip[1] + ' ' + line)
-            if ip1 == 172 and ip2 >= 16 and ip2 <= 31:
-                externo = "error"
-                return ("Error ip " + campos[5] + 'xxx' + line)
-            if ip1 == 192 and ip2 == 168:
-                externo = "error"
-                return ("Error ip " + campos[5] + 'xxx' + line)
-            if ip1 == 193 and ip2 == 145 and ip3 >= 96 and ip3 <= 125:
-                externo = "interno"
-                tipoconex = "Cableada"
-        print("{0};{1};{2};{3};{4};{5};1".format(year, mes, dia, hora, externo, tipoconex))
+            cadena_ip = ip[0] + ";" + ip[1] + ";" + ip[2] + ";" + ip[3]
+
+        print("{0};{1};{2};{3};{4};{5};{6};1".format(year, mes, dia, hora, server, aplicacion, cadena_ip))
     return lines
 
 
