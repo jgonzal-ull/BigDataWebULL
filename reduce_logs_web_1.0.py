@@ -5,11 +5,9 @@
 import sys
 import collections
 
-# Map básico que ya clasifica las líneas en franjas horarias y procedencia interna y externa de la ULL
 def reduce():
     lines = 0
-    valores = dict()
-    tipos = dict()
+    logs_mensuales = dict()
 
     lugar = {"monitorizar": 0,"redirigir": 1, "interno": 2, "externo": 3}
     tipo = {"externo": 0, "Cableada": 1, "Wifi": 2}
@@ -21,18 +19,18 @@ def reduce():
         mes = campos[1]
         dia = campos[2]
         hora = campos[3]
-        externo = campos[4]
-        tipoorigen =campos[5]
-        valor = campos[6]
-        clave = anio+mes+dia+hora
-        if clave in valores:
-            valores[clave][lugar[externo]] += int(valor)
-            tipos[clave][tipo[tipoorigen]] += int(valor)
+        sistema = campos[4]
+        aplicacion =campos[5]
+        ip0 = campos[6]
+        ip1 = campos[7]
+        ip2 = campos[8]
+        ip3 = campos[9]
+        valor = campos[10]
+        clave_anio_mes = anio+mes
+        if clave_anio_mes in valores:
+            valores[clave_anio_mes] += int(valor)
         else:
-            valores[clave]=[0,0,0,0]
-            tipos[clave]=[0,0,0]
-            valores[clave][lugar[externo]] += int(valor)
-            tipos[clave][tipo[tipoorigen]] += int(valor)
+            logs_mensuales[clave] = int(valor)
     print("Anio;Mes;Dia;Hora;Monitorizar;Redirigir;Interno;Externo;Externo;Cableada;Wifi")
     itemssalida = collections.OrderedDict(sorted(valores.items()))
     for indice in itemssalida:
@@ -51,3 +49,8 @@ def main():
 if __name__ == '__main__':
     main()
 
+
+def imprime_logs_mensuales():
+    global
+    for clave, valor in logs:
+        print("Mes: %d: %d logs" % (clave, valor))
